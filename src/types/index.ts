@@ -13,3 +13,17 @@ export type QuizSettings = {
   difficulty: Difficulty;
   numQuestions: NumQuestion;
 };
+
+export enum Choice {
+  A,
+  B,
+  C,
+  D,
+}
+
+export interface Question {
+  question: string;
+  choices: Record<Choice, string>;
+  answer: Choice;
+  explanation: string;
+}

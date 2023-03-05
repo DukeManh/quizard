@@ -1,4 +1,10 @@
-import type { Difficulty, NumQuestion } from '../types';
+import type {
+  Question as QuestionType,
+  Difficulty,
+  NumQuestion,
+  QuizSettings,
+  Choice,
+} from '../types';
 
 class Quiz {
   constructor(
@@ -6,12 +12,15 @@ class Quiz {
     public topic: string,
     public difficulty: Difficulty,
     public numQuestions: NumQuestion,
-    public questions: Question[]
+    public questions: Question[],
+    public loaded: boolean = false
   ) {}
 }
 
-class Question {
+class Question implements QuestionType {
   constructor(
+    public number: string,
+    public quizId: string,
     public question: string,
     public choices: Record<Choice, string>,
     public answer: Choice,
@@ -19,18 +28,21 @@ class Question {
   ) {}
 }
 
-enum Choice {
-  A,
-  B,
-  C,
-  D,
-}
-
 export class Quizzes {
   private static quizzes: Quiz[] = [];
 
   static async findOne(id: string) {
-    return this.quizzes.find((quiz) => quiz.id === id);
+    const quiz = this.quizzes.find((q) => q.id === id);
+    if (!quiz) return undefined;
+    const { topic, difficulty, numQuestions, questions, loaded } = quiz;
+    return {
+      id,
+      topic,
+      difficulty,
+      numQuestions,
+      questions,
+      loaded,
+    };
   }
 
   static async updateOne(id: string, data: Partial<Quiz>) {
@@ -52,14 +64,15 @@ export class Quizzes {
     return quizId;
   }
 
-  static async insert(data: Exclude<Quiz, 'id'>) {
+  static async insert(data: QuizSettings) {
     const quiz = new Quiz(
       this.quizzes.length.toString(),
       data.topic,
       data.difficulty,
       data.numQuestions,
-      data.questions
+      []
     );
+    this.quizzes.push(quiz);
     return quiz.id;
   }
 }

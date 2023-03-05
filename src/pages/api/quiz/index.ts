@@ -1,8 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import type { QuizSettings, Message } from '../../../types/index';
+import type { QuizSettings, Message, Question } from '../../../types/index';
 import { createChatCompletion } from '~/utils/chatgpt';
+import { Quizzes } from '~/utils/db';
 import { getQuizGenerationPrompt } from '~/utils/prompts';
 
 const validateRequest = (req: NextApiRequest) => {
@@ -49,9 +50,37 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     },
   ];
 
-  const completion = await createChatCompletion(messages);
+  const newQuiz = await Quizzes.insert({
+    difficulty,
+    numQuestions,
+    topic,
+  });
+
+  createChatCompletion(messages).then((completion) => {
+    try {
+      if (!completion) {
+        throw new Error('');
+      }
+
+      const questions = JSON.parse(completion) as Question[];
+      const dbQuestions = questions.map((q, index) => {
+        return {
+          ...q,
+          number: index.toString(),
+          quizId: newQuiz,
+        };
+      });
+
+      Quizzes.updateOne(newQuiz, {
+        questions: dbQuestions,
+        loaded: true,
+      });
+    } catch (err) {
+      Quizzes.deleteOne(newQuiz);
+    }
+  });
 
   res.status(200).json({
-    quiz: completion,
+    quizId: newQuiz,
   });
 };

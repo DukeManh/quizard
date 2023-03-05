@@ -10,6 +10,7 @@ import {
   Stack,
 } from '@chakra-ui/react';
 import { NextSeo } from 'next-seo';
+import { useEffect } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
@@ -34,6 +35,11 @@ const Home = () => {
     // eslint-disable-next-line no-console
     getQuiz(data);
   };
+
+  // Workaround to make NextJS pre-compile /api/quiz/[id] endpoint
+  useEffect(() => {
+    fetch('/api/quiz/0');
+  }, []);
 
   const topics = [
     'Breaking Bad',
