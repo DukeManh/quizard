@@ -7,3 +7,9 @@ export type Difficulty = 'easy' | 'medium' | 'hard';
 export type Topic = string;
 
 export type Message = ChatCompletionRequestMessage;
+
+export type QuizSettings = {
+  topic: Topic;
+  difficulty: Difficulty;
+  numQuestions: NumQuestion;
+};
