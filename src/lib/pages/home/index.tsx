@@ -13,12 +13,18 @@ import { NextSeo } from 'next-seo';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
-import type { Difficulty, NumQuestion } from '~/types';
+import type { QuizSettings as Inputs } from '~/types';
 
-type Inputs = {
-  topic: string;
-  difficulty: Difficulty;
-  numberOfQuestions: NumQuestion;
+const getQuiz = async (data: Inputs) => {
+  const searchResponse = await fetch('/api/quiz', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  // eslint-disable-next-line no-console
+  console.log(await searchResponse.json());
 };
 
 const Home = () => {
@@ -26,7 +32,7 @@ const Home = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     // eslint-disable-next-line no-console
-    console.log(data);
+    getQuiz(data);
   };
 
   const topics = [
@@ -81,7 +87,7 @@ const Home = () => {
             placeholder="Number of questions"
             aria-label="Number of questions"
             defaultValue={numberOfQuestions[0]}
-            {...register('numberOfQuestions')}
+            {...register('numQuestions')}
           >
             {numberOfQuestions.map((option) => (
               <option key={option} value={option}>

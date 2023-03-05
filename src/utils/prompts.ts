@@ -1,6 +1,4 @@
-type NumQuestion = 5 | 10 | 15 | 20;
-type Difficulty = 'easy' | 'medium' | 'hard';
-type Topic = string;
+import type { Difficulty, NumQuestion, Topic } from '~/types';
 
 export const getQuizGenerationPrompt = (
   numQuestion: NumQuestion,
