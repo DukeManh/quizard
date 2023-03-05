@@ -1,6 +1,6 @@
 {
-  "short_name": "nextarter-chakra",
-  "name": "Next.js App Template",
+  "short_name": "quizard",
+  "name": "Quiz yourself on anything",
   "lang": "en",
   "start_url": "/",
   "background_color": "#FFFFFF",
