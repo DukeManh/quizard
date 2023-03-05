@@ -14,14 +14,21 @@ export type QuizSettings = {
   numQuestions: NumQuestion;
 };
 
+export interface Quiz extends QuizSettings {
+  id: string;
+  questions: Question[];
+  loaded: boolean;
+}
+
 export enum Choice {
-  A,
-  B,
-  C,
-  D,
+  A = 'A',
+  B = 'B',
+  C = 'C',
+  D = 'D',
 }
 
 export interface Question {
+  number: string;
   question: string;
   choices: Record<Choice, string>;
   answer: Choice;

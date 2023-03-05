@@ -19,7 +19,7 @@ const Page500 = () => {
 
   return (
     <Flex minHeight="70vh" direction="column" justifyContent="center">
-      <NextSeo title="500 Server Side Error Occured" />
+      <NextSeo title="500 Server Side Error Occurred" />
       <MotionBox
         animate={{ y: 20 }}
         transition={{ repeat: Infinity, duration: 2, repeatType: 'reverse' }}

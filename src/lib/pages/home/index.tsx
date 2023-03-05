@@ -9,6 +9,7 @@ import {
   Radio,
   Stack,
 } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import { NextSeo } from 'next-seo';
 import { useEffect } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
@@ -16,24 +17,25 @@ import { useForm } from 'react-hook-form';
 
 import type { QuizSettings as Inputs } from '~/types';
 
-const getQuiz = async (data: Inputs) => {
-  const searchResponse = await fetch('/api/quiz', {
+const newQuiz = async (data: Inputs) => {
+  const quiz = await fetch('/api/quiz', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
   });
-  // eslint-disable-next-line no-console
-  console.log(await searchResponse.json());
+  return quiz.json();
 };
 
 const Home = () => {
   const { register, handleSubmit } = useForm<Inputs>();
+  const router = useRouter();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     // eslint-disable-next-line no-console
-    getQuiz(data);
+    const { quizId } = await newQuiz(data);
+    router.push(`/quiz/${quizId}`);
   };
 
   // Workaround to make NextJS pre-compile /api/quiz/[id] endpoint

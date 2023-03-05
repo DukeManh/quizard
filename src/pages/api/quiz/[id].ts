@@ -14,9 +14,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     if (!quiz) {
       res.redirect('/404');
     } else {
-      res.status(200).json({
-        quiz,
-      });
+      res.status(200).json(quiz);
     }
   } catch {
     res.redirect('/500');

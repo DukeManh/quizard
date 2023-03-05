@@ -4,9 +4,10 @@ import type {
   NumQuestion,
   QuizSettings,
   Choice,
+  Quiz as QuizType,
 } from '../types';
 
-class Quiz {
+class Quiz implements QuizType {
   constructor(
     public id: string,
     public topic: string,
@@ -32,17 +33,7 @@ export class Quizzes {
   private static quizzes: Quiz[] = [];
 
   static async findOne(id: string) {
-    const quiz = this.quizzes.find((q) => q.id === id);
-    if (!quiz) return undefined;
-    const { topic, difficulty, numQuestions, questions, loaded } = quiz;
-    return {
-      id,
-      topic,
-      difficulty,
-      numQuestions,
-      questions,
-      loaded,
-    };
+    return this.quizzes.find((q) => q.id === id);
   }
 
   static async updateOne(id: string, data: Partial<Quiz>) {
@@ -53,6 +44,7 @@ export class Quizzes {
     quiz.numQuestions = data.numQuestions ?? quiz.numQuestions;
     quiz.topic = data.topic ?? quiz.topic;
     quiz.questions = data.questions ?? quiz.questions;
+    quiz.loaded = data.loaded ?? quiz.loaded;
     return quiz.id;
   }
 
