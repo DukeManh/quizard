@@ -7,6 +7,7 @@ import {
   Link as ChakraLink,
   useColorMode,
   Flex,
+  Center,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { NextSeo } from 'next-seo';
@@ -25,10 +26,13 @@ const Page500 = () => {
         width={{ base: '100%', sm: '70%', md: '60%' }}
         margin="0 auto"
       >
-        <Image
-          src="/Under construction-amico.svg"
-          alt="Error 500 Illustration"
-        />
+        <Center>
+          <Image
+            src="/Under construction-amico.svg"
+            alt="Error 500 Illustration"
+            maxW="300px"
+          />
+        </Center>
       </MotionBox>
       <Text textAlign="center" fontSize="xs" color="gray">
         <ChakraLink
