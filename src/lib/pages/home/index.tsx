@@ -104,7 +104,7 @@ const Home = () => {
             ))}
           </Select>
           <Center>
-            <Button type="submit">Start</Button>
+            <Button type="submit">Enter</Button>
           </Center>
         </Flex>
       </form>

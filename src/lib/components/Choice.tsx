@@ -5,9 +5,13 @@ import type { Choice } from '~/types';
 const ChoiceComponent = ({
   choice,
   content,
+  onSelect,
+  answer,
 }: {
   choice: Choice;
   content: string;
+  onSelect: (choice: Choice) => void;
+  answer: Choice | undefined;
 }) => {
   const colors = {
     A: '#E74C3C',
@@ -24,10 +28,13 @@ const ChoiceComponent = ({
         flexBasis: 'calc(100% / 2)',
         padding: '0.5rem',
       }}
+      onClick={() => onSelect(choice)}
     >
       <Center
         minH="15rem"
-        bg={colors[choice]}
+        bg={
+          !answer ? colors[choice] : answer === choice ? 'green.500' : 'red.500'
+        }
         _hover={{
           filter: 'brightness(0.9)',
         }}

@@ -5,7 +5,15 @@ import { Choice } from '~/types';
 
 import ChoiceComponent from './Choice';
 
-const QuestionComponent = ({ question }: { question: Question }) => {
+const QuestionComponent = ({
+  question,
+  onSelect,
+  answer,
+}: {
+  question: Question;
+  onSelect: (choice: Choice) => void;
+  answer: Choice | undefined;
+}) => {
   return (
     <>
       <Text as="h1" fontSize="4xl">
@@ -17,6 +25,8 @@ const QuestionComponent = ({ question }: { question: Question }) => {
             key={choice.toString()}
             choice={choice}
             content={question.choices[choice]}
+            onSelect={onSelect}
+            answer={answer}
           />
         ))}
       </Flex>
