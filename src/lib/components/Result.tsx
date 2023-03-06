@@ -12,19 +12,16 @@ import type { Check, Quiz } from '~/types';
 
 const Result = ({ answers, quiz }: { answers: Check[]; quiz: Quiz }) => {
   const correct = answers.filter((a) => a.correct).length;
-  const rating = correct < 5 ? 0 : correct < 7 ? 1 : 2;
+  const percentage = (correct / answers.length) * 100;
+  const rating = percentage < 50 ? 0 : percentage < 70 ? 1 : 2;
   return (
     <Box textAlign="center" py={10} px={6}>
-      {rating === 0 ? (
-        <Text fontSize="7xl">😢</Text>
-      ) : correct === 1 ? (
-        <Text fontSize="7xl">😐</Text>
-      ) : (
-        <Text fontSize="7xl">🎉</Text>
-      )}
+      <Text fontSize="6xl">
+        {rating === 0 ? '😢' : rating === 1 ? '😀' : '🎉'}
+      </Text>
 
       <Heading as="h2" size="xl" mt={6} mb={2}>
-        {quiz.topic} | {quiz.difficulty} | {quiz.numQuestions}
+        &quot;{quiz.topic}&quot; | {quiz.difficulty} | {quiz.numQuestions}
       </Heading>
 
       <Text color="gray.500" fontSize="lg">

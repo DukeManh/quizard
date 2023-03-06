@@ -8,10 +8,11 @@ import {
   RadioGroup,
   Radio,
   Stack,
+  Input,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { NextSeo } from 'next-seo';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
@@ -28,9 +29,24 @@ const newQuiz = async (data: Inputs) => {
   return quiz.json();
 };
 
+const topicSuggestions = [
+  'Star Wars',
+  'Grammar and punctuation',
+  'Mythology',
+  'Spanish',
+  'Classic rock bands',
+  'Cryptocurrency',
+  'Board games',
+  'Harry Potter',
+  'Wildlife',
+  'Disney movies',
+  'Broadway musicals',
+];
+
 const Home = () => {
   const { register, handleSubmit } = useForm<Inputs>();
   const router = useRouter();
+  const [suggestion, setSuggestion] = useState<number>(0);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     // eslint-disable-next-line no-console
@@ -38,18 +54,12 @@ const Home = () => {
     router.push(`/quiz/${quizId}`);
   };
 
-  // Workaround to make NextJS pre-compile /api/quiz/[id] endpoint
   useEffect(() => {
-    fetch('/api/quiz/0');
+    const suggest = setInterval(() => {
+      setSuggestion((prev) => (prev + 1) % topicSuggestions.length);
+    }, 3000);
+    return () => clearInterval(suggest);
   }, []);
-
-  const topics = [
-    'Breaking Bad',
-    'Geography',
-    'French language',
-    'Harry Potter',
-    'Ancient Rome',
-  ];
 
   const difficulty = ['easy', 'medium', 'hard'];
 
@@ -68,24 +78,22 @@ const Home = () => {
         Put your knowledge to the test
       </Text>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Text>I would like to test my knowledge on:</Text>
+        <Text>I&lsquo;d like be quizzed on:</Text>
         <Flex direction="column" justifyContent="center" gap={4}>
-          <Select
-            placeholder="Select topic"
+          <Input
+            placeholder={topicSuggestions[suggestion]}
             aria-label="quiz topic"
-            defaultValue={topics[1]}
-            {...register('topic')}
-          >
-            {topics.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </Select>
+            {...register('topic', { required: true })}
+            maxLength={50}
+          />
           <RadioGroup defaultValue={difficulty[1]}>
             <Stack direction="row">
               {difficulty.map((option) => (
-                <Radio key={option} value={option} {...register('difficulty')}>
+                <Radio
+                  key={option}
+                  value={option}
+                  {...register('difficulty', { required: true })}
+                >
                   {option.charAt(0).toUpperCase() + option.slice(1)}
                 </Radio>
               ))}
@@ -94,12 +102,12 @@ const Home = () => {
           <Select
             placeholder="Number of questions"
             aria-label="Number of questions"
+            {...register('numQuestions', { required: true })}
             defaultValue={numberOfQuestions[0]}
-            {...register('numQuestions')}
           >
             {numberOfQuestions.map((option) => (
               <option key={option} value={option}>
-                {option}
+                # of questions: {option}
               </option>
             ))}
           </Select>
