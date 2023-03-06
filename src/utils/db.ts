@@ -75,6 +75,8 @@ export class Quizzes {
         explanation: question.explanation,
         answer: question.answer,
         choice,
+        questionNumber,
+        quizId: id,
       };
     }
   }

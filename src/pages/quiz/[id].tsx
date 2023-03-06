@@ -1,14 +1,25 @@
-import { Button, Container, Progress, Text } from '@chakra-ui/react';
+import {
+  Button,
+  Center,
+  Container,
+  Flex,
+  Spinner,
+  Text,
+} from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
 import QuestionComponent from '~/lib/components/Question';
-import type { CheckAnswerResponse, Choice, Quiz } from '~/types';
+import Result from '~/lib/components/Result';
+import type { Check, Choice, Quiz } from '~/types';
 
 const QuizPage = () => {
   const router = useRouter();
   const { id, q: questionNum } = router.query;
   const [quiz, setQuiz] = useState<Quiz>();
+  const isQuizLoaded = quiz && quiz.loaded;
+  const [answers, setAnswers] = useState<Check[]>([]);
+  const [ended, setEnded] = useState(false);
 
   useEffect(() => {
     let interval: string | number | NodeJS.Timeout | undefined;
@@ -18,6 +29,9 @@ const QuizPage = () => {
         fetch(`/api/quiz/${id}`)
           .then((res) => res.json())
           .then((data) => {
+            router.push(`/quiz/${id}`, undefined, {
+              shallow: true,
+            });
             setQuiz(data);
           });
       } else {
@@ -25,11 +39,8 @@ const QuizPage = () => {
       }
     }, 3000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, quiz]);
-
-  const isQuizLoaded = quiz && quiz.loaded;
-  const [answer, setAnswer] = useState<CheckAnswerResponse>();
-  const [selectedAnswer, setSelectedAnswer] = useState<Choice>();
 
   const startQuiz = () => {
     if (!questionNum && isQuizLoaded) {
@@ -43,7 +54,6 @@ const QuizPage = () => {
       : undefined;
 
   const onSelect = (choice: Choice) => {
-    setSelectedAnswer(choice);
     fetch(`/api/quiz/${id}/question/${question?.number}`, {
       method: 'POST',
       headers: {
@@ -53,19 +63,22 @@ const QuizPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setAnswer(data);
+        setAnswers([...answers, data]);
       });
   };
 
   const nextQuestion = () => {
-    setAnswer(undefined);
-    setSelectedAnswer(undefined);
     if (questionNum && isQuizLoaded) {
       const nextQuestionNum = Number(questionNum) + 1;
       if (nextQuestionNum < quiz.questions.length) {
         router.push(`/quiz/${id}?q=${nextQuestionNum}`, undefined, {
           shallow: true,
         });
+      } else {
+        router.push(`/quiz/${id}?completed=true`, undefined, {
+          shallow: true,
+        });
+        setEnded(true);
       }
     }
   };
@@ -74,8 +87,16 @@ const QuizPage = () => {
     return null;
   }
 
+  if (ended)
+    return (
+      <Container maxW="5xl" minHeight="80vh">
+        <Result answers={answers} quiz={quiz!} />
+      </Container>
+    );
+
+  const answer = answers.find((a) => a.questionNumber === question?.number);
   return (
-    <Container maxW="5xl" minH="80vh">
+    <Container maxW="5xl" minHeight="80vh">
       {questionNum && isQuizLoaded ? (
         <>
           <QuestionComponent
@@ -83,20 +104,23 @@ const QuizPage = () => {
             question={question!}
             answer={answer}
           />
-          {selectedAnswer && (
-            <Button type="button" onClick={nextQuestion}>
-              Next
-            </Button>
+          {answer && (
+            <Center>
+              <Button size="lg" type="button" onClick={nextQuestion}>
+                Next
+              </Button>
+            </Center>
           )}
         </>
       ) : (
-        <>
-          {!isQuizLoaded && (
-            <>
-              <Text>Preparing your quiz...</Text>
-              <Progress isIndeterminate />
-            </>
-          )}
+        <Flex
+          minH="100%"
+          justify="center"
+          align="center"
+          direction="column"
+          padding={14}
+          gap={4}
+        >
           <Button
             isDisabled={!isQuizLoaded}
             _disabled={{
@@ -105,10 +129,16 @@ const QuizPage = () => {
               boxShadow: 'none',
             }}
             onClick={startQuiz}
+            size="lg"
           >
-            Start
+            <Center gap={2}>
+              <Text>Start</Text>
+              {!isQuizLoaded && <Spinner size="sm" />}
+            </Center>
+            <Center />
           </Button>
-        </>
+          <Text>{!isQuizLoaded && <>Preparing your quiz...</>}</Text>
+        </Flex>
       )}
     </Container>
   );

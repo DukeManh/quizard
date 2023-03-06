@@ -1,6 +1,6 @@
 import { Center, Text } from '@chakra-ui/react';
 
-import type { CheckAnswerResponse, Choice } from '~/types';
+import type { Check, Choice } from '~/types';
 
 const ChoiceComponent = ({
   choice,
@@ -11,7 +11,7 @@ const ChoiceComponent = ({
   choice: Choice;
   content: string;
   onSelect: (choice: Choice) => void;
-  answer: CheckAnswerResponse | undefined;
+  answer: Check | undefined;
 }) => {
   const colors = {
     A: '#E74C3C',
@@ -28,6 +28,7 @@ const ChoiceComponent = ({
         flexBasis: 'calc(100% / 2)',
         padding: '0.5rem',
       }}
+      disabled={!!answer}
       onClick={() => onSelect(choice)}
     >
       <Center
@@ -41,6 +42,7 @@ const ChoiceComponent = ({
         }
         _hover={{
           filter: 'brightness(0.9)',
+          transition: 'all 0.15s ease-in-out',
         }}
       >
         <Text as="p" fontSize="4xl">
