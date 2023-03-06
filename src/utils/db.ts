@@ -1,70 +1,81 @@
-import type {
-  Question as QuestionType,
-  Difficulty,
-  NumQuestion,
-  QuizSettings,
-  Choice,
-  Quiz as QuizType,
-} from '../types';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  addDoc,
+  collection,
+} from 'firebase/firestore';
 
-class Quiz implements QuizType {
-  constructor(
-    public id: string,
-    public topic: string,
-    public difficulty: Difficulty,
-    public numQuestions: NumQuestion,
-    public questions: Question[],
-    public loaded: boolean = false
-  ) {}
-}
+import type { QuizSettings, Choice, Quiz, Question } from '../types';
 
-class Question implements QuestionType {
-  constructor(
-    public number: string,
-    public quizId: string,
-    public question: string,
-    public choices: Record<Choice, string>,
-    public answer: Choice,
-    public explanation: string
-  ) {}
-}
+import { db } from './firebase';
 
 export class Quizzes {
-  private static quizzes: Quiz[] = [];
+  static async findOne(id: string): Promise<Quiz | undefined> {
+    const docRef = doc(db, 'quiz', id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return undefined;
 
-  static async findOne(id: string) {
-    return this.quizzes.find((q) => q.id === id);
+    const quiz = docSnap.data() as Quiz;
+    return {
+      ...quiz,
+      questions: quiz.questions.map((q: Question) => ({
+        question: q.question,
+        choices: q.choices,
+        number: q.number,
+      })),
+      loaded: quiz.loaded,
+    };
   }
 
   static async updateOne(id: string, data: Partial<Quiz>) {
-    const index = this.quizzes.findIndex((q) => q.id === id);
-    if (index === -1) throw new Error('Quiz not found');
-    const quiz = this.quizzes[index];
-    quiz.difficulty = data.difficulty ?? quiz.difficulty;
-    quiz.numQuestions = data.numQuestions ?? quiz.numQuestions;
-    quiz.topic = data.topic ?? quiz.topic;
-    quiz.questions = data.questions ?? quiz.questions;
-    quiz.loaded = data.loaded ?? quiz.loaded;
-    return quiz.id;
+    const docRef = doc(db, 'quiz', id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      throw new Error('Quiz not found');
+    } else {
+      setDoc(docRef, data, {
+        merge: true,
+      });
+    }
+
+    return docSnap.id;
   }
 
   static async deleteOne(id: string) {
-    const index = this.quizzes.findIndex((q) => q.id === id);
-    if (index === -1) throw new Error('Quiz not found');
-    const quizId = this.quizzes[index].id;
-    this.quizzes.splice(index, 1);
-    return quizId;
+    const docRef = doc(db, 'quiz', id);
+    await deleteDoc(docRef);
+    return id;
   }
 
   static async insert(data: QuizSettings) {
-    const quiz = new Quiz(
-      this.quizzes.length.toString(),
-      data.topic,
-      data.difficulty,
-      data.numQuestions,
-      []
-    );
-    this.quizzes.push(quiz);
-    return quiz.id;
+    const docSnap = await addDoc(collection(db, 'quiz'), {
+      topic: data.topic,
+      difficulty: data.difficulty,
+      numQuestions: data.numQuestions,
+      questions: [],
+      loaded: false,
+    });
+
+    return docSnap.id;
+  }
+
+  static async checkAnswer(id: string, questionNumber: string, choice: Choice) {
+    const docRef = doc(db, 'quiz', id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      throw new Error('Quiz not found');
+    } else {
+      const question = docSnap
+        .data()
+        .questions.find((q: Question) => q.number === questionNumber);
+      return {
+        correct: question.answer === choice,
+        explanation: question.explanation,
+        answer: question.answer,
+        choice,
+      };
+    }
   }
 }

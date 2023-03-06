@@ -31,6 +31,16 @@ export interface Question {
   number: string;
   question: string;
   choices: Record<Choice, string>;
+}
+
+export interface QuestionWithAnswer extends Question {
   answer: Choice;
   explanation: string;
+}
+
+export interface CheckAnswerResponse {
+  correct: boolean;
+  explanation: string;
+  answer: Choice;
+  choice: Choice;
 }

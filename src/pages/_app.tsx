@@ -22,7 +22,6 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       <DefaultSeo {...defaultSEOConfig} />
       <SWRConfig
         value={{
-          refreshInterval: 3000,
           fetcher: (resource, init) =>
             fetch(resource, init).then((res) => {
               if (res.status >= 404) {

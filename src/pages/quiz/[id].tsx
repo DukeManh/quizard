@@ -1,17 +1,34 @@
 import { Button, Container, Progress, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
-import useSWR from 'swr';
+import { useState, useEffect } from 'react';
 
 import QuestionComponent from '~/lib/components/Question';
-import type { Choice, Quiz } from '~/types';
+import type { CheckAnswerResponse, Choice, Quiz } from '~/types';
 
 const QuizPage = () => {
   const router = useRouter();
   const { id, q: questionNum } = router.query;
-  const { data: quiz } = useSWR<Quiz>(`/api/quiz/${id}`);
+  const [quiz, setQuiz] = useState<Quiz>();
+
+  useEffect(() => {
+    let interval: string | number | NodeJS.Timeout | undefined;
+    // eslint-disable-next-line prefer-const
+    interval = setInterval(() => {
+      if (!quiz || !quiz.loaded) {
+        fetch(`/api/quiz/${id}`)
+          .then((res) => res.json())
+          .then((data) => {
+            setQuiz(data);
+          });
+      } else {
+        clearInterval(interval);
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [id, quiz]);
+
   const isQuizLoaded = quiz && quiz.loaded;
-  const [answer, setAnswer] = useState<Choice>();
+  const [answer, setAnswer] = useState<CheckAnswerResponse>();
   const [selectedAnswer, setSelectedAnswer] = useState<Choice>();
 
   const startQuiz = () => {
@@ -26,8 +43,18 @@ const QuizPage = () => {
       : undefined;
 
   const onSelect = (choice: Choice) => {
-    setAnswer(question!.answer);
     setSelectedAnswer(choice);
+    fetch(`/api/quiz/${id}/question/${question?.number}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ choice }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setAnswer(data);
+      });
   };
 
   const nextQuestion = () => {
@@ -40,9 +67,6 @@ const QuizPage = () => {
           shallow: true,
         });
       }
-      //  else {
-      //   router.push(`/quiz/${id}/results`, undefined, { shallow: true });
-      // }
     }
   };
 

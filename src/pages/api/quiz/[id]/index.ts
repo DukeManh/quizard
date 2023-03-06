@@ -16,7 +16,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     } else {
       res.status(200).json(quiz);
     }
-  } catch {
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(err);
     res.redirect('/500');
   }
 };

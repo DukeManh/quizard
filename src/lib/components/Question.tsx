@@ -1,6 +1,6 @@
 import { Flex, Text } from '@chakra-ui/react';
 
-import type { Question } from '~/types';
+import type { CheckAnswerResponse, Question } from '~/types';
 import { Choice } from '~/types';
 
 import ChoiceComponent from './Choice';
@@ -12,7 +12,7 @@ const QuestionComponent = ({
 }: {
   question: Question;
   onSelect: (choice: Choice) => void;
-  answer: Choice | undefined;
+  answer: CheckAnswerResponse | undefined;
 }) => {
   return (
     <>
