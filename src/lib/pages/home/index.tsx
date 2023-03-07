@@ -78,12 +78,13 @@ const Home = () => {
   const numberOfQuestions = [5, 10, 15, 20];
 
   return (
-    <Container minH="80vh">
+    <Container minH="80vh" paddingTop={2}>
       <NextSeo title="Home" />
       <Text
-        fontSize="4xl"
+        fontSize={{ base: '2xl', md: '4xl' }}
+        marginBottom={2}
         sx={{
-          textAlign: 'center',
+          textAlign: 'left',
         }}
         as="h1"
       >
