@@ -1,4 +1,13 @@
-import { Text, Container, Flex, Box, Image, Spacer } from '@chakra-ui/react';
+import {
+  Text,
+  Container,
+  Flex,
+  Box,
+  Image,
+  Spacer,
+  Link,
+} from '@chakra-ui/react';
+import NextLink from 'next/link';
 
 const Header = () => {
   return (
@@ -13,15 +22,17 @@ const Header = () => {
         <Box>
           <Image src="/quizard.svg" width="2rem" alt="quizard logo" />
         </Box>
-        <Text
-          as="p"
+        <Link
+          as={NextLink}
           fontSize="2xl"
           fontWeight="bold"
           color="#93CDFD"
           fontFamily="'Rampart One', cursive;"
+          href="/"
+          _hover={{ textDecoration: 'none' }}
         >
           quizard
-        </Text>
+        </Link>
         <Spacer />
         <Text as="p" fontSize="12px" fontWeight="bold" color="gray.500">
           Powered by chatGPT
