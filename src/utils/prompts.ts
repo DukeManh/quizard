@@ -7,7 +7,7 @@ export const getQuizGenerationPrompt = (
 ) => {
   return `Generate a quiz with the requested number of questions, difficulty level and topic.You must be highly confident in knowing the correct answer to the questions.The multiple choices should be short and maximum of 2 sentences.
 
-New: 2 questions, easy difficulty, the topic is Breaking Bad
+New: 2 questions, easy difficulty, the topic is "Breaking Bad"
 Quiz: [
     {
       "question": "What is the name of the chemical compound that Walter White and Jesse Pinkman cook in the series?",
@@ -34,7 +34,7 @@ Quiz: [
   ]
 
 """
-New: 1 question, hard difficulty, the topic is ReactJS
+New: 1 question, hard difficulty, the topic is "ReactJS"
 Quiz: [
   {
     "question": "What is the difference between a controlled component and an uncontrolled component in React?",
@@ -50,6 +50,6 @@ Quiz: [
 ]
 """
 
-New: ${numQuestion} question(s), ${difficulty} difficulty, the topic is ${topic}
+New: ${numQuestion} question(s), ${difficulty} difficulty, the topic is "${topic}"
 Quiz: `;
 };
