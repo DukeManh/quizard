@@ -1,4 +1,4 @@
-import { Flex, Text } from '@chakra-ui/react';
+import { Grid, Text } from '@chakra-ui/react';
 
 import type { Check, Question } from '~/types';
 import { Choice } from '~/types';
@@ -16,10 +16,17 @@ const QuestionComponent = ({
 }) => {
   return (
     <>
-      <Text as="h1" fontSize="4xl">
+      <Text
+        as="h1"
+        fontSize={{
+          base: '2xl',
+          md: '3xl',
+        }}
+        marginBottom={2}
+      >
         {question.question}
       </Text>
-      <Flex direction="row" wrap="wrap">
+      <Grid templateColumns="repeat(2, 1fr)" gap={1}>
         {[Choice.A, Choice.B, Choice.C, Choice.D].map((choice) => (
           <ChoiceComponent
             key={choice.toString()}
@@ -29,7 +36,7 @@ const QuestionComponent = ({
             answer={answer}
           />
         ))}
-      </Flex>
+      </Grid>
     </>
   );
 };

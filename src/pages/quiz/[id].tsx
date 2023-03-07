@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Center,
   Container,
@@ -105,11 +106,16 @@ const QuizPage = () => {
             answer={answer}
           />
           {answer && (
-            <Center>
-              <Button size="lg" type="button" onClick={nextQuestion}>
-                Next
-              </Button>
-            </Center>
+            <Box marginTop={2}>
+              <Text fontSize="md" color="gray.400">
+                {answer.explanation}
+              </Text>
+              <Flex justify="end">
+                <Button size="lg" type="button" onClick={nextQuestion}>
+                  Next
+                </Button>
+              </Flex>
+            </Box>
           )}
         </>
       ) : (

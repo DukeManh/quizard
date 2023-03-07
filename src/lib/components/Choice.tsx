@@ -33,19 +33,29 @@ const ChoiceComponent = ({
     >
       <Center
         minH="15rem"
+        sx={{
+          ...(!!answer &&
+            answer.answer !== choice && {
+              opacity: 0.9,
+            }),
+          transition: 'all 0.05s ease-in-out',
+        }}
         bg={
           !answer
             ? colors[choice]
             : answer.answer === choice
             ? 'green.500'
+            : choice === answer.choice && !answer.correct
+            ? 'gray.500'
             : 'red.500'
         }
         _hover={{
-          filter: 'brightness(0.9)',
-          transition: 'all 0.15s ease-in-out',
+          ...(!answer && {
+            filter: 'brightness(0.9)',
+          }),
         }}
       >
-        <Text as="p" fontSize="4xl">
+        <Text as="p" fontSize={{ base: '1.5rem', md: '2rem' }}>
           {content}
         </Text>
       </Center>
