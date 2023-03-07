@@ -28,7 +28,7 @@ Quiz: [
         "C": "Hector Salamanca",
         "D": "Don Eladio"
       },
-      "answer": "Gus Fring",
+      "answer": "A",
       "explanation": "Gus is a highly intelligent and ruthless drug lord who becomes a major antagonist in the series. He is known for his calm demeanor and meticulous planning."
     }
   ]
