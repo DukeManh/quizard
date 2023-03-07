@@ -19,6 +19,12 @@ class MyDocument extends Document {
             href="https://fonts.googleapis.com/css2?family=Figtree:wght@300..900&display=swap"
             rel="stylesheet"
           />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Rampart+One&display=swap"
+            rel="stylesheet"
+          />
           <Meta />
         </Head>
         <body>
