@@ -31,7 +31,7 @@ const Result = ({ answers, quiz }: { answers: Check[]; quiz: Quiz }) => {
         {quiz.questions.map((q) => {
           const answer = answers.find((a) => a.questionNumber === q.number);
           return (
-            <AccordionItem>
+            <AccordionItem key={q.number}>
               <AccordionButton>
                 <Box as="span" flex="1" textAlign="left">
                   <Text>

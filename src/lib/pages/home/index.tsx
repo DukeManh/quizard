@@ -9,6 +9,7 @@ import {
   Radio,
   Stack,
   Input,
+  Spinner,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { NextSeo } from 'next-seo';
@@ -47,11 +48,22 @@ const Home = () => {
   const { register, handleSubmit } = useForm<Inputs>();
   const router = useRouter();
   const [suggestion, setSuggestion] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    // eslint-disable-next-line no-console
-    const { quizId } = await newQuiz(data);
-    router.push(`/quiz/${quizId}`);
+    setLoading(true);
+    newQuiz(data)
+      .then(({ quizId }) => {
+        if (quizId) {
+          router.push(`/quiz/${quizId}`);
+        }
+      })
+      .catch((err) => {
+        setError('Unable to start a new quiz. Please try again.');
+        console.error(err);
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -111,8 +123,14 @@ const Home = () => {
               </option>
             ))}
           </Select>
-          <Center>
-            <Button type="submit">Enter</Button>
+          <Center flexDir="column">
+            <Button type="submit" isDisabled={loading || !!error}>
+              <Center gap={1}>
+                <Text>Enter</Text>
+                {loading && <Spinner size="sm" />}
+              </Center>
+            </Button>
+            <Text color={error ? 'red.500' : 'transparent'}>{error}</Text>
           </Center>
         </Flex>
       </form>
