@@ -8,6 +8,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
+import { NextSeo } from 'next-seo';
 import { useState, useEffect } from 'react';
 
 import QuestionComponent from '~/lib/components/Question';
@@ -98,6 +99,7 @@ const QuizPage = () => {
   const answer = answers.find((a) => a.questionNumber === question?.number);
   return (
     <Container maxW="5xl" minHeight="80vh">
+      <NextSeo title={quiz?.topic} />
       {questionNum && isQuizLoaded ? (
         <>
           <QuestionComponent

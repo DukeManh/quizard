@@ -4,15 +4,15 @@ const defaultSEOConfig = {
   titleTemplate: '%s | quizard',
   defaultTitle: 'quizard',
   description: 'Quiz me on any anything',
-  canonical: 'https://nextarter-chakra.sznm.dev',
+  canonical: 'https://quizard-kappa.vercel.app/',
   openGraph: {
-    url: 'https://nextarter-chakra.sznm.dev',
-    title: 'nextarter-chakra',
+    url: 'https://quizard-kappa.vercel.app/',
+    title: 'quizard',
     description: 'Quiz me on any anything',
     images: [
       {
-        url: 'https://og-image.sznm.dev/**nextarter-chakra**.sznm.dev.png?theme=dark&md=1&fontSize=125px&images=https%3A%2F%2Fsznm.dev%2Favataaars.svg&widths=250',
-        alt: 'nextarter-chakra.sznm.dev og-image',
+        url: 'https://quizard-kappa.vercel.app/og.png',
+        alt: 'quizard - quizzes, trivia on any topic',
       },
     ],
     site_name: 'quizard',
