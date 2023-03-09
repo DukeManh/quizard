@@ -45,8 +45,8 @@ const Home = () => {
   const { register, handleSubmit } = useForm<Inputs>();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>();
-  const [placeholder, setPlaceholder] = useState<string>('');
+  const [error, setError] = useState<string>();
+  const [placeholder, setPlaceholder] = useState('');
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setLoading(true);

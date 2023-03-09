@@ -8,9 +8,9 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-import type { Check, Quiz } from '~/types';
+import type { Answer, Quiz } from '~/types';
 
-const Result = ({ answers, quiz }: { answers: Check[]; quiz: Quiz }) => {
+const Result = ({ answers, quiz }: { answers: Answer[]; quiz: Quiz }) => {
   const correct = answers.filter((a) => a.correct).length;
   const percentage = (correct / answers.length) * 100;
   const rating = percentage < 50 ? 0 : percentage < 70 ? 1 : 2;

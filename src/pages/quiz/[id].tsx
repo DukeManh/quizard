@@ -14,27 +14,46 @@ import { useState, useEffect } from 'react';
 import BlinkingDots from '~/lib/components/BlinkingDots';
 import QuestionComponent from '~/lib/components/Question';
 import Result from '~/lib/components/Result';
-import type { Check, Choice, Quiz } from '~/types';
+import type { Answer, Choice, Quiz } from '~/types';
+
+const getQuiz = async (id: string) => {
+  const res = await fetch(`/api/quiz/${id}`);
+  return res.json();
+};
+
+const checkAnswer = async (
+  id: string,
+  questionNumber: string,
+  choice: Choice
+) => {
+  const res = await fetch(`/api/quiz/${id}/question/${questionNumber}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ choice }),
+  });
+  return res.json();
+};
 
 const QuizPage = () => {
   const router = useRouter();
   const { id, q: questionNum } = router.query;
   const [quiz, setQuiz] = useState<Quiz>();
   const isQuizLoaded = quiz && quiz.loaded;
-  const [answers, setAnswers] = useState<Check[]>([]);
+  const [answers, setAnswers] = useState<Answer[]>([]);
   const [ended, setEnded] = useState(false);
+  const [selected, setSelected] = useState<Choice>();
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (!quiz || !quiz.loaded) {
-        fetch(`/api/quiz/${id}`)
-          .then((res) => res.json())
-          .then((data) => {
-            router.push(`/quiz/${id}`, undefined, {
-              shallow: true,
-            });
-            setQuiz(data);
+        getQuiz(id as string).then((data) => {
+          router.push(`/quiz/${id}`, undefined, {
+            shallow: true,
           });
+          setQuiz(data);
+        });
       } else {
         clearInterval(interval);
       }
@@ -55,32 +74,34 @@ const QuizPage = () => {
       : undefined;
 
   const onSelect = (choice: Choice) => {
-    fetch(`/api/quiz/${id}/question/${question?.number}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ choice }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setAnswers([...answers, data]);
-      });
+    if (selected || !question) {
+      return;
+    }
+
+    setSelected(choice);
+
+    checkAnswer(id as string, question.number, choice).then((data) => {
+      setAnswers([...answers, data]);
+    });
   };
 
   const nextQuestion = () => {
-    if (questionNum && isQuizLoaded) {
-      const nextQuestionNum = Number(questionNum) + 1;
-      if (nextQuestionNum < quiz.questions.length) {
-        router.push(`/quiz/${id}?q=${nextQuestionNum}`, undefined, {
-          shallow: true,
-        });
-      } else {
-        router.push(`/quiz/${id}?completed=true`, undefined, {
-          shallow: true,
-        });
-        setEnded(true);
-      }
+    if (!questionNum || !isQuizLoaded) {
+      return;
+    }
+
+    setSelected(undefined);
+
+    const nextQuestionNum = Number(questionNum) + 1;
+    if (nextQuestionNum < quiz.questions.length) {
+      router.push(`/quiz/${id}?q=${nextQuestionNum}`, undefined, {
+        shallow: true,
+      });
+    } else {
+      router.push(`/quiz/${id}?completed=true`, undefined, {
+        shallow: true,
+      });
+      setEnded(true);
     }
   };
 
@@ -106,6 +127,7 @@ const QuizPage = () => {
             onSelect={onSelect}
             question={question!}
             answer={answer}
+            selected={selected}
           />
           {answer && (
             <Box marginTop={2}>
@@ -158,5 +180,4 @@ const QuizPage = () => {
     </Container>
   );
 };
-
 export default QuizPage;

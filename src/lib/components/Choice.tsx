@@ -1,17 +1,19 @@
 import { Center, Text } from '@chakra-ui/react';
 
-import type { Check, Choice } from '~/types';
+import type { Answer, Choice } from '~/types';
 
 const ChoiceComponent = ({
   choice,
   content,
   onSelect,
   answer,
+  selected,
 }: {
   choice: Choice;
   content: string;
   onSelect: (choice: Choice) => void;
-  answer: Check | undefined;
+  answer: Answer | undefined;
+  selected: Choice | undefined;
 }) => {
   const colors = {
     A: '#E74C3C',
@@ -20,35 +22,39 @@ const ChoiceComponent = ({
     D: '#F1C40F',
   };
 
+  const isCorrect = answer && answer.answer === choice;
+  const loadingAnswer = selected && !answer;
+
+  const bgColor = !answer
+    ? colors[choice]
+    : answer.answer === choice
+    ? 'green.500'
+    : choice === answer.choice && !answer.correct
+    ? 'gray.500'
+    : 'red.500';
+
   return (
     <button
       type="button"
       style={{
         display: 'block',
-        flexBasis: 'calc(100% / 2)',
         padding: '0.5rem',
       }}
-      disabled={!!answer}
+      disabled={!!selected}
       onClick={() => onSelect(choice)}
     >
       <Center
         minH="15rem"
         sx={{
-          ...(!!answer &&
-            answer.answer !== choice && {
-              opacity: 0.9,
-            }),
-          transition: 'all 0.05s ease-in-out',
+          ...(loadingAnswer && {
+            filter: 'brightness(0.9)',
+          }),
+          ...(!isCorrect && {
+            opacity: 0.9,
+          }),
+          transition: 'all 0.1s ease-in-out',
         }}
-        bg={
-          !answer
-            ? colors[choice]
-            : answer.answer === choice
-            ? 'green.500'
-            : choice === answer.choice && !answer.correct
-            ? 'gray.500'
-            : 'red.500'
-        }
+        bg={bgColor}
         _hover={{
           ...(!answer && {
             filter: 'brightness(0.9)',

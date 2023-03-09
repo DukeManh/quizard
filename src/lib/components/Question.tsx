@@ -1,6 +1,6 @@
 import { Grid, Text } from '@chakra-ui/react';
 
-import type { Check, Question } from '~/types';
+import type { Answer, Question } from '~/types';
 import { Choice } from '~/types';
 
 import ChoiceComponent from './Choice';
@@ -9,11 +9,15 @@ const QuestionComponent = ({
   question,
   onSelect,
   answer,
+  selected,
 }: {
   question: Question;
   onSelect: (choice: Choice) => void;
-  answer: Check | undefined;
+  answer: Answer | undefined;
+  selected: Choice | undefined;
 }) => {
+  const { A, B, C, D } = Choice;
+
   return (
     <>
       <Text
@@ -27,13 +31,14 @@ const QuestionComponent = ({
         {question.question}
       </Text>
       <Grid templateColumns="repeat(2, 1fr)" gap={1}>
-        {[Choice.A, Choice.B, Choice.C, Choice.D].map((choice) => (
+        {[A, B, C, D].map((choice) => (
           <ChoiceComponent
             key={choice.toString()}
             choice={choice}
             content={question.choices[choice]}
             onSelect={onSelect}
             answer={answer}
+            selected={selected}
           />
         ))}
       </Grid>

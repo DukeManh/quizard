@@ -33,7 +33,7 @@ export interface Question {
   choices: Record<Choice, string>;
 }
 
-export interface Check {
+export interface Answer {
   correct: boolean;
   explanation: string;
   answer: Choice;
