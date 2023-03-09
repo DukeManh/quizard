@@ -31,25 +31,22 @@ const newQuiz = async (data: Inputs) => {
 };
 
 const topicSuggestions = [
-  'Star Wars',
-  'Grammar and punctuation',
-  'Mythology',
-  'Spanish',
-  'Classic rock bands',
+  'Countries and Capitals',
+  'System Design interview',
+  "Who's smarter than a 5th grader?",
+  'Spanish vocabulary',
   'Cryptocurrency',
-  'Board games',
-  'Harry Potter',
-  'Wildlife',
-  'Disney movies',
-  'Broadway musicals',
+  'Harry Potter trivia',
+  'Machine learning interview',
+  'General Knowledge',
 ];
 
 const Home = () => {
   const { register, handleSubmit } = useForm<Inputs>();
   const router = useRouter();
-  const [suggestion, setSuggestion] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>();
+  const [placeholder, setPlaceholder] = useState<string>('');
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setLoading(true);
@@ -67,10 +64,32 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const suggest = setInterval(() => {
-      setSuggestion((prev) => (prev + 1) % topicSuggestions.length);
-    }, 3000);
-    return () => clearInterval(suggest);
+    let typing: NodeJS.Timeout;
+    let newSuggestion: NodeJS.Timeout;
+
+    const updatePlaceholder = (currentIndex: number) => {
+      setPlaceholder('');
+      const delay = 70;
+      const currentTopic = topicSuggestions[currentIndex];
+      let currentChar = 0;
+      typing = setInterval(() => {
+        setPlaceholder(currentTopic.substring(0, currentChar + 1));
+        currentChar += 1;
+        if (currentChar > currentTopic.length) {
+          clearInterval(typing);
+          newSuggestion = setTimeout(() => {
+            updatePlaceholder((currentIndex + 1) % topicSuggestions.length);
+          }, 1000);
+        }
+      }, delay);
+    };
+
+    updatePlaceholder(0);
+
+    return () => {
+      clearInterval(typing);
+      clearTimeout(newSuggestion);
+    };
   }, []);
 
   const difficulty = ['easy', 'medium', 'hard'];
@@ -94,8 +113,8 @@ const Home = () => {
         <Text>I&lsquo;d like be quizzed on:</Text>
         <Flex direction="column" justifyContent="center" gap={4}>
           <Input
-            placeholder={topicSuggestions[suggestion]}
             aria-label="quiz topic"
+            placeholder={placeholder}
             {...register('topic', { required: true })}
             maxLength={50}
           />

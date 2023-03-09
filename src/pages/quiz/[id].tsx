@@ -24,9 +24,7 @@ const QuizPage = () => {
   const [ended, setEnded] = useState(false);
 
   useEffect(() => {
-    let interval: string | number | NodeJS.Timeout | undefined;
-    // eslint-disable-next-line prefer-const
-    interval = setInterval(() => {
+    const interval = setInterval(() => {
       if (!quiz || !quiz.loaded) {
         fetch(`/api/quiz/${id}`)
           .then((res) => res.json())
