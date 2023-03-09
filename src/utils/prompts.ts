@@ -5,7 +5,7 @@ export const getQuizGenerationPrompt = (
   difficulty: Difficulty,
   topic: Topic
 ) => {
-  return `Generate a quiz with the requested number of questions, difficulty level and topic.You must be highly confident in knowing the correct answer to the questions.The multiple choices should be short and maximum of 2 sentences.
+  return `Generate a quiz with the requested number of questions, difficulty level and topic.You must be highly confident in knowing the correct answer to the questions.The multiple choices should be maximum of 2 sentences. The correct answer should be placed randomly in the multiple choices. The explanation should be maximum of 2 sentences.
 
 New: 2 questions, easy difficulty, the topic is "Breaking Bad"
 Quiz: [
