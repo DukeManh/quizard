@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { NextSeo } from 'next-seo';
 import { useState, useEffect } from 'react';
 
+import BlinkingDots from '~/lib/components/BlinkingDots';
 import QuestionComponent from '~/lib/components/Question';
 import Result from '~/lib/components/Result';
 import type { Check, Choice, Quiz } from '~/types';
@@ -95,6 +96,7 @@ const QuizPage = () => {
     );
 
   const answer = answers.find((a) => a.questionNumber === question?.number);
+
   return (
     <Container maxW="5xl" minHeight="80vh">
       <NextSeo title={quiz?.topic} />
@@ -143,7 +145,14 @@ const QuizPage = () => {
             </Center>
             <Center />
           </Button>
-          <Text>{!isQuizLoaded && <>Preparing your quiz...</>}</Text>
+          <Text>
+            {!isQuizLoaded && (
+              <>
+                <span>Preparing your quiz </span>
+                <BlinkingDots />
+              </>
+            )}
+          </Text>
         </Flex>
       )}
     </Container>
