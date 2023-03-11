@@ -5,7 +5,7 @@ import type { Message } from '~/types';
 const GPT_TURBO = 'gpt-3.5-turbo';
 const GPT_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-/** Wait until chat completion is complete is return the first message content */
+/** Wait until chat completion is complete and return the first message content */
 export const createChatCompletion = async (
   messages: Message[],
   openAIKey?: string

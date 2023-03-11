@@ -15,12 +15,31 @@ const Result = ({ answers, quiz }: { answers: Answer[]; quiz: Quiz }) => {
   const percentage = (correct / answers.length) * 100;
   const rating = percentage < 50 ? 0 : percentage < 70 ? 1 : 2;
   return (
-    <Box textAlign="center" py={10} px={6}>
+    <Box
+      textAlign="center"
+      py={{
+        base: 5,
+        md: 10,
+      }}
+      px={{
+        base: '0',
+        md: '6',
+      }}
+    >
       <Text fontSize="6xl">
         {rating === 0 ? '😢' : rating === 1 ? '😀' : '🎉'}
       </Text>
 
-      <Heading as="h2" size="xl" mt={6} mb={2}>
+      <Heading
+        as="h2"
+        size="xl"
+        mt={6}
+        mb={2}
+        fontSize={{
+          base: 'xl',
+          md: '3xl',
+        }}
+      >
         &quot;{quiz.topic}&quot; | {quiz.difficulty} | {quiz.numQuestions}
       </Heading>
 
@@ -35,8 +54,7 @@ const Result = ({ answers, quiz }: { answers: Answer[]; quiz: Quiz }) => {
               <AccordionButton>
                 <Box as="span" flex="1" textAlign="left">
                   <Text>
-                    {answer?.correct ? '✅' : '❌'}
-                    {'    '}
+                    {answer?.correct ? '✅ ' : '❌ '}
                     {q.question}
                   </Text>
                 </Box>
