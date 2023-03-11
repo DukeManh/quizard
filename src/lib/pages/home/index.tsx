@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
+import useLocalStorage from '~/lib/hooks/use-local-storage';
 import type { QuizSettings } from '~/types';
 
 interface Inputs extends QuizSettings {
@@ -52,7 +53,12 @@ const topicSuggestions = [
 ];
 
 const Home = () => {
-  const { register, handleSubmit, watch } = useForm<Inputs>();
+  const [openAIKey, saveOpenAIKey] = useLocalStorage('openAIKey');
+  const { register, handleSubmit, watch } = useForm<Inputs>({
+    defaultValues: {
+      openAIKey: openAIKey || '',
+    },
+  });
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
@@ -180,6 +186,9 @@ const Home = () => {
                 placeholder="sk-••••••••••••••••••••••••••••••••••••••••••••••••"
                 type={show ? 'text' : 'password'}
                 {...register('openAIKey')}
+                onChange={(e) => {
+                  saveOpenAIKey(e.target.value);
+                }}
               />
               <InputRightElement width="4.5rem">
                 <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
