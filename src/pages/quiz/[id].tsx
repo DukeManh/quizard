@@ -40,14 +40,15 @@ const QuizPage = () => {
   const router = useRouter();
   const { id, q: questionNum } = router.query;
   const [quiz, setQuiz] = useState<Quiz>();
-  const isQuizLoaded = quiz && quiz.loaded;
+  const isQuizLoaded = quiz && quiz.loaded === true;
+  const isQuizFailed = quiz && quiz.failed === true;
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [ended, setEnded] = useState(false);
   const [selected, setSelected] = useState<Choice>();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!quiz || !quiz.loaded) {
+      if (!quiz || (!quiz.loaded && !quiz.failed)) {
         getQuiz(id as string).then((data) => {
           router.push(`/quiz/${id}`, undefined, {
             shallow: true,
@@ -152,7 +153,7 @@ const QuizPage = () => {
           gap={4}
         >
           <Button
-            isDisabled={!isQuizLoaded}
+            isDisabled={!isQuizLoaded || isQuizFailed}
             _disabled={{
               opacity: 0.5,
               cursor: 'not-allowed',
@@ -163,17 +164,19 @@ const QuizPage = () => {
           >
             <Center gap={2}>
               <Text>Start</Text>
-              {!isQuizLoaded && <Spinner size="sm" />}
+              {!isQuizLoaded && !quiz?.failed && <Spinner size="sm" />}
             </Center>
             <Center />
           </Button>
           <Text>
-            {!isQuizLoaded && (
+            {isQuizFailed ? (
+              <Text color="red.500">{quiz.reason}</Text>
+            ) : !isQuizLoaded ? (
               <>
                 <span>Preparing your quiz </span>
                 <BlinkingDots />
               </>
-            )}
+            ) : null}
           </Text>
         </Flex>
       )}

@@ -1,3 +1,4 @@
+import { ExternalLinkIcon } from '@chakra-ui/icons';
 import {
   Flex,
   Text,
@@ -10,6 +11,10 @@ import {
   Stack,
   Input,
   Spinner,
+  Box,
+  Link,
+  InputGroup,
+  InputRightElement,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { NextSeo } from 'next-seo';
@@ -17,9 +22,13 @@ import { useEffect, useState } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
-import type { QuizSettings as Inputs } from '~/types';
+import type { QuizSettings } from '~/types';
 
-const newQuiz = async (data: Inputs) => {
+interface Inputs extends QuizSettings {
+  openAIKey?: string;
+}
+
+const createNewQuiz = async (data: Inputs) => {
   const quiz = await fetch('/api/quiz', {
     method: 'POST',
     headers: {
@@ -33,6 +42,7 @@ const newQuiz = async (data: Inputs) => {
 const topicSuggestions = [
   'Countries and Capitals',
   'System Design interview',
+  'MacOS shortcuts',
   "Who's smarter than a 5th grader?",
   'Spanish vocabulary',
   'Cryptocurrency',
@@ -42,15 +52,16 @@ const topicSuggestions = [
 ];
 
 const Home = () => {
-  const { register, handleSubmit } = useForm<Inputs>();
+  const { register, handleSubmit, watch } = useForm<Inputs>();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
   const [placeholder, setPlaceholder] = useState('');
+  const [show, setShow] = useState(false);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setLoading(true);
-    newQuiz(data)
+    createNewQuiz(data)
       .then(({ quizId }) => {
         if (quizId) {
           router.push(`/quiz/${quizId}`);
@@ -66,10 +77,11 @@ const Home = () => {
   useEffect(() => {
     let typing: NodeJS.Timeout;
     let newSuggestion: NodeJS.Timeout;
+    const delay = 70;
+    const timeout = 1000;
 
     const updatePlaceholder = (currentIndex: number) => {
       setPlaceholder('');
-      const delay = 70;
       const currentTopic = topicSuggestions[currentIndex];
       let currentChar = 0;
       typing = setInterval(() => {
@@ -79,7 +91,7 @@ const Home = () => {
           clearInterval(typing);
           newSuggestion = setTimeout(() => {
             updatePlaceholder((currentIndex + 1) % topicSuggestions.length);
-          }, 1000);
+          }, timeout);
         }
       }, delay);
     };
@@ -138,11 +150,44 @@ const Home = () => {
             defaultValue={numberOfQuestions[0]}
           >
             {numberOfQuestions.map((option) => (
-              <option key={option} value={option}>
+              <option
+                key={option}
+                value={option}
+                disabled={option > 10 && !watch('openAIKey')}
+              >
                 # of questions: {option}
               </option>
             ))}
           </Select>
+
+          <Box>
+            <Text>
+              Use your &nbsp;
+              <Link
+                href="https://platform.openai.com/account/api-keys"
+                target="_blank"
+                rel="noreferrer"
+                isExternal
+              >
+                openAI key
+                <ExternalLinkIcon mx="1px" />
+              </Link>
+              &nbsp; to get more questions
+            </Text>
+            <InputGroup>
+              <Input
+                aria-label="openAI key"
+                placeholder="sk-••••••••••••••••••••••••••••••••••••••••••••••••"
+                type={show ? 'text' : 'password'}
+                {...register('openAIKey')}
+              />
+              <InputRightElement width="4.5rem">
+                <Button h="1.75rem" size="sm" onClick={() => setShow(!show)}>
+                  {show ? 'Hide' : 'Show'}
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+          </Box>
           <Center flexDir="column">
             <Button type="submit" isDisabled={loading || !!error}>
               <Center gap={1}>

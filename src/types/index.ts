@@ -18,6 +18,8 @@ export interface Quiz extends QuizSettings {
   id: string;
   questions: Question[];
   loaded: boolean;
+  failed: boolean;
+  reason?: string;
 }
 
 export enum Choice {

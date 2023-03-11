@@ -56,6 +56,8 @@ export class Quizzes {
       numQuestions: data.numQuestions,
       questions: [],
       loaded: false,
+      failed: false,
+      reason: '',
     });
 
     return docSnap.id;

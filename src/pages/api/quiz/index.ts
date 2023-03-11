@@ -7,14 +7,16 @@ import { Quizzes } from '~/utils/db';
 import { getQuizGenerationPrompt } from '~/utils/prompts';
 
 const validateRequest = (req: NextApiRequest) => {
-  const { difficulty, numQuestions, topic } = req.body;
+  const { difficulty, numQuestions, topic, openAIKey } = req.body;
   return (
     (difficulty &&
       numQuestions &&
       topic &&
       topic.trim().length &&
       ['easy', 'medium', 'hard'].includes(difficulty)) ||
-    !Number.isNaN(Number.parseInt(numQuestions, 10))
+    (!Number.isNaN(Number.parseInt(numQuestions, 10)) &&
+      typeof openAIKey &&
+      openAIKey !== 'string')
   );
 };
 
@@ -32,11 +34,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         difficulty: 'easy | medium | hard',
         numQuestions: 'number',
         topic: 'string',
+        openAIKey: '?string',
       },
     });
   }
 
   const { difficulty, numQuestions, topic } = req.body as QuizSettings;
+  const { openAIKey } = req.body;
 
   const messages: Message[] = [
     {
@@ -56,29 +60,43 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     topic,
   });
 
-  createChatCompletion(messages).then((completion) => {
-    try {
-      if (!completion) {
-        throw new Error('');
+  createChatCompletion(messages, openAIKey)
+    .then((completion) => {
+      try {
+        const questions = JSON.parse(completion!) as Question[];
+        const dbQuestions = questions.map((q, index) => {
+          return {
+            ...q,
+            number: index.toString(),
+            quizId: newQuiz,
+          };
+        });
+
+        Quizzes.updateOne(newQuiz, {
+          questions: dbQuestions,
+          loaded: true,
+        });
+      } catch (err) {
+        Quizzes.updateOne(newQuiz, {
+          failed: true,
+          reason: 'Failed to parse quiz',
+        });
       }
-
-      const questions = JSON.parse(completion) as Question[];
-      const dbQuestions = questions.map((q, index) => {
-        return {
-          ...q,
-          number: index.toString(),
-          quizId: newQuiz,
-        };
-      });
-
-      Quizzes.updateOne(newQuiz, {
-        questions: dbQuestions,
-        loaded: true,
-      });
-    } catch (err) {
-      Quizzes.deleteOne(newQuiz);
-    }
-  });
+    })
+    .catch(() => {
+      if (openAIKey) {
+        Quizzes.updateOne(newQuiz, {
+          failed: true,
+          reason: 'There was a problem generate quiz with your openAI key',
+        });
+      } else {
+        Quizzes.updateOne(newQuiz, {
+          failed: true,
+          reason:
+            'There was a problem generate quiz, please try again with your openAI key',
+        });
+      }
+    });
 
   res.status(200).json({
     quizId: newQuiz,
