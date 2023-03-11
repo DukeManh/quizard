@@ -1,5 +1,6 @@
 import type { Difficulty, NumQuestion, Topic } from '~/types';
 
+/** Prompt to generate a quiz object with the requested number of questions, difficulty level and topic */
 export const getQuizGenerationPrompt = (
   numQuestion: NumQuestion,
   difficulty: Difficulty,
@@ -33,7 +34,7 @@ Quiz: [
     }
   ]
 
-"""
+##
 New: 1 question, hard difficulty, the topic is "ReactJS"
 Quiz: [
   {
@@ -48,8 +49,19 @@ Quiz: [
     "explanation": "Controlled components are React components that have their state managed by React, while uncontrolled components have their state managed by the DOM. This means that controlled components are more flexible and allow for more control over the data being manipulated."
   }
 ]
-"""
+##
 
 New: ${numQuestion} question(s), ${difficulty} difficulty, the topic is "${topic}"
 Quiz: `;
+};
+
+/** Prompt to return a comma separated list of subtopics of a given topic */
+export const getQuizTopicSuggestionPrompt = (topic: Topic) => {
+  return `Give a comma-separated list of 5 to 7 sub-topics for the given quiz topic. The categories of the sub-topics may include popular sub-topics people tend to be interested in, skills or knowledge required to understand a topic and recent trends and developments in a given field.
+
+topic: Machine learning
+subtopics: Natural Language Processing (NLP), Computer Vision, Convolutional Neural Networks, History of Artificial Intelligence, Machine Learning Python Libraries
+
+topic: ${topic}
+subtopics: `;
 };

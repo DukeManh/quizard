@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import type { QuizSettings, Message, Question } from '../../../types/index';
@@ -79,7 +78,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       } catch (err) {
         Quizzes.updateOne(newQuiz, {
           failed: true,
-          reason: 'Failed to parse quiz',
+          reason: 'Failed to parse quiz, ensure the quiz topic is valid',
         });
       }
     })

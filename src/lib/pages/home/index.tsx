@@ -16,6 +16,8 @@ import {
   InputGroup,
   InputRightElement,
 } from '@chakra-ui/react';
+import type { ParsedEvent, ReconnectInterval } from 'eventsource-parser';
+import { createParser } from 'eventsource-parser';
 import { useRouter } from 'next/router';
 import { NextSeo } from 'next-seo';
 import { useEffect, useState } from 'react';
@@ -23,38 +25,18 @@ import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
 import useLocalStorage from '~/lib/hooks/use-local-storage';
-import type { QuizSettings } from '~/types';
 
-interface Inputs extends QuizSettings {
-  openAIKey?: string;
-}
-
-const createNewQuiz = async (data: Inputs) => {
-  const quiz = await fetch('/api/quiz', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  return quiz.json();
-};
-
-const topicSuggestions = [
-  'Countries and Capitals',
-  'System Design interview',
-  'MacOS shortcuts',
-  "Who's smarter than a 5th grader?",
-  'Spanish vocabulary',
-  'Cryptocurrency',
-  'Harry Potter trivia',
-  'Machine learning interview',
-  'General Knowledge',
-];
+import type { Inputs } from './utils';
+import {
+  readStream,
+  topicSuggestions,
+  createNewQuiz,
+  getTopicSuggestion,
+} from './utils';
 
 const Home = () => {
   const [openAIKey, saveOpenAIKey] = useLocalStorage('openAIKey');
-  const { register, handleSubmit, watch } = useForm<Inputs>({
+  const { register, handleSubmit, watch, setValue } = useForm<Inputs>({
     defaultValues: {
       openAIKey: openAIKey || '',
     },
@@ -64,6 +46,50 @@ const Home = () => {
   const [error, setError] = useState<string>();
   const [placeholder, setPlaceholder] = useState('');
   const [show, setShow] = useState(false);
+  const [subTopics, setSubTopics] = useState('');
+  const [subTopicsSuggestion, setSubTopicsSuggestion] = useState({
+    topic: '',
+    subTopics: [] as string[],
+  });
+
+  const getSubTopics = async (topic: string) => {
+    setSubTopics('');
+    setSubTopicsSuggestion({ topic: '', subTopics: [] });
+    const stream = await getTopicSuggestion(topic);
+    if (!stream) {
+      return;
+    }
+
+    // Parse data-only eventsource message from openai to json
+    const onParse = (event: ParsedEvent | ReconnectInterval) => {
+      if (event.type === 'event') {
+        const { data } = event;
+        if (data === '[DONE]') {
+          setSubTopicsSuggestion((prev) => ({
+            topic,
+            subTopics: prev.topic.split(', '),
+          }));
+          return;
+        }
+        try {
+          const json = JSON.parse(data);
+          const text = json.choices[0].delta.content;
+          if (text) {
+            setSubTopics((prev) => prev + text);
+            setSubTopicsSuggestion((prev) => ({
+              ...prev,
+              topic: prev.topic + text,
+            }));
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    const parser = createParser(onParse);
+
+    readStream(stream, parser.feed);
+  };
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setLoading(true);
@@ -113,29 +139,80 @@ const Home = () => {
   const difficulty = ['easy', 'medium', 'hard'];
 
   const numberOfQuestions = [5, 10, 15, 20];
-
   return (
-    <Container minH="80vh" paddingTop={2}>
+    <Container minH="80vh" paddingTop={5}>
       <NextSeo title="Home" />
       <Text
-        fontSize={{ base: '2xl', md: '4xl' }}
+        fontSize={{ base: 'lg', md: '2xl' }}
         marginBottom={2}
         sx={{
           textAlign: 'left',
         }}
         as="h1"
       >
-        Put your knowledge to the test
+        Expand your knowledge with personalized quizzes
       </Text>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Text>I&lsquo;d like be quizzed on:</Text>
         <Flex direction="column" justifyContent="center" gap={4}>
-          <Input
-            aria-label="quiz topic"
-            placeholder={placeholder}
-            {...register('topic', { required: true })}
-            maxLength={50}
-          />
+          <Box>
+            <InputGroup>
+              <Input
+                aria-label="quiz topic"
+                placeholder={placeholder}
+                {...register('topic', { required: true })}
+                maxLength={50}
+              />
+              <InputRightElement width="5.4rem">
+                <Button
+                  isDisabled={!watch('topic')}
+                  h="1.75rem"
+                  size="sm"
+                  onClick={() => getSubTopics(watch('topic'))}
+                >
+                  Suggest
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+            <Box
+              sx={{
+                transition: 'height 0.5s ease-in-out',
+                px: 1,
+              }}
+            >
+              {subTopicsSuggestion.subTopics.length ? (
+                <Text fontSize="sm" color="gray.500">
+                  {subTopicsSuggestion.subTopics.map((subTopic, index) => (
+                    <Text
+                      as="span"
+                      key={subTopic}
+                      onClick={() => {
+                        setValue(
+                          'topic',
+                          `${subTopicsSuggestion.topic}: ${subTopic}`
+                        );
+                      }}
+                      sx={{
+                        cursor: 'pointer',
+                        ':hover': {
+                          textDecoration: 'underline',
+                        },
+                      }}
+                    >
+                      <span>{subTopic}</span>
+                      {index !== subTopicsSuggestion.subTopics.length - 1 && (
+                        <span>{', '}</span>
+                      )}
+                    </Text>
+                  ))}
+                </Text>
+              ) : (
+                <Text fontSize="sm" color="gray.500">
+                  {subTopics}
+                </Text>
+              )}
+            </Box>
+          </Box>
           <RadioGroup defaultValue={difficulty[1]}>
             <Stack direction="row">
               {difficulty.map((option) => (

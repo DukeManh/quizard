@@ -13,6 +13,7 @@ specifiers:
   eslint: ^8.34.0
   eslint-config-next: ^13.1.6
   eslint-config-sznm: ^1.1.0
+  eventsource-parser: ^0.1.0
   firebase: ^9.17.2
   framer-motion: ^8.5.5
   husky: ^8.0.3
@@ -37,6 +38,7 @@ dependencies:
   '@chakra-ui/react': 2.5.1_u2ncbuhn2wsnc7epp3ngi7slxm
   '@emotion/react': 11.10.6_pmekkgnqduwlme35zpnqhenc34
   '@emotion/styled': 11.10.6_oouaibmszuch5k64ms7uxp2aia
+  eventsource-parser: 0.1.0
   firebase: 9.17.2
   framer-motion: 8.5.5_biqbaboplfbrettd7655fr4n2y
   next: 13.2.3_biqbaboplfbrettd7655fr4n2y
@@ -5221,6 +5223,11 @@ packages:
   /esutils/2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
+
+  /eventsource-parser/0.1.0:
+    resolution: {integrity: sha512-M9QjFtEIkwytUarnx113HGmgtk52LSn3jNAtnWKi3V+b9rqSfQeVdLsaD5AG/O4IrGQwmAAHBIsqbmURPTd2rA==}
+    engines: {node: '>=14.18'}
+    dev: false
 
   /execa/6.1.0:
     resolution: {integrity: sha512-QVWlX2e50heYJcCPG0iWtf8r0xjEYfz/OYLGDYH+IyjWezzPNxz63qNFOu0l4YftGWuizFVZHHs8PrLU5p2IDA==}
