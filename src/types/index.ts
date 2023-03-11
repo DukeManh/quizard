@@ -20,6 +20,8 @@ export interface Quiz extends QuizSettings {
   loaded: boolean;
   failed: boolean;
   reason?: string;
+  last_updated: Date;
+  created_date: Date;
 }
 
 export enum Choice {

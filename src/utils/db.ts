@@ -5,6 +5,7 @@ import {
   deleteDoc,
   addDoc,
   collection,
+  serverTimestamp,
 } from 'firebase/firestore';
 
 import type { QuizSettings, Choice, Quiz, Question } from '../types';
@@ -25,7 +26,6 @@ export class Quizzes {
         choices: q.choices,
         number: q.number,
       })),
-      loaded: quiz.loaded,
     };
   }
 
@@ -35,9 +35,16 @@ export class Quizzes {
     if (!docSnap.exists()) {
       throw new Error('Quiz not found');
     } else {
-      setDoc(docRef, data, {
-        merge: true,
-      });
+      setDoc(
+        docRef,
+        {
+          ...data,
+          last_updated: serverTimestamp(),
+        },
+        {
+          merge: true,
+        }
+      );
     }
 
     return docSnap.id;
@@ -58,6 +65,8 @@ export class Quizzes {
       loaded: false,
       failed: false,
       reason: '',
+      created_date: serverTimestamp(),
+      last_updated: serverTimestamp(),
     });
 
     return docSnap.id;
