@@ -53,7 +53,10 @@ const QuizPage = () => {
           router.push(`/quiz/${id}`, undefined, {
             shallow: true,
           });
-          setQuiz(data);
+          setQuiz((prev) => ({
+            ...prev,
+            ...data,
+          }));
         });
       } else {
         clearInterval(interval);

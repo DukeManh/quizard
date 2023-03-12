@@ -76,23 +76,25 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           loaded: true,
         });
       } catch (err) {
+        console.error('Failed to parse quiz', err);
         Quizzes.updateOne(newQuiz, {
           failed: true,
           reason: 'Failed to parse quiz, ensure the quiz topic is valid',
         });
       }
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error('Failed to create quiz', err);
       if (openAIKey) {
         Quizzes.updateOne(newQuiz, {
           failed: true,
-          reason: 'There was a problem generate quiz with your openAI key',
+          reason: 'There was a problem generating quiz with your openAI key',
         });
       } else {
         Quizzes.updateOne(newQuiz, {
           failed: true,
           reason:
-            'There was a problem generate quiz, please try again with your openAI key',
+            'There was a problem generating quiz, please try again with your openAI key',
         });
       }
     });

@@ -1,15 +1,21 @@
 import {
-  Text,
   Container,
   Flex,
   Box,
   Image,
   Spacer,
   Link,
+  IconButton,
+  useColorMode,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
+import { RiMoonFill, RiSunLine } from 'react-icons/ri';
 
 const Header = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
+
+  const logoColor = useColorModeValue('#51abcb', '#82c1f5');
   return (
     <Container maxW="4xl" h="3.5rem" my={2}>
       <Flex
@@ -26,7 +32,7 @@ const Header = () => {
           as={NextLink}
           fontSize="2xl"
           fontWeight="bold"
-          color="#93CDFD"
+          color={logoColor}
           fontFamily="'Rampart One', cursive;"
           href="/"
           _hover={{ textDecoration: 'none' }}
@@ -34,9 +40,14 @@ const Header = () => {
           quizard
         </Link>
         <Spacer />
-        <Text as="p" fontSize="12px" fontWeight="bold" color="gray.500">
+        {/* <Text as="p" fontSize="12px" fontWeight="bold" color="gray.500">
           Powered by chatGPT
-        </Text>
+        </Text> */}
+        <IconButton
+          aria-label="theme toggle"
+          icon={colorMode === 'light' ? <RiMoonFill /> : <RiSunLine />}
+          onClick={toggleColorMode}
+        />
       </Flex>
     </Container>
   );

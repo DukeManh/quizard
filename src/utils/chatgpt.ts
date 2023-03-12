@@ -1,3 +1,4 @@
+import axios from 'axios';
 import type { CreateChatCompletionResponse } from 'openai';
 
 import type { Message } from '~/types';
@@ -10,25 +11,25 @@ export const createChatCompletion = async (
   messages: Message[],
   openAIKey?: string
 ) => {
-  const response = await fetch(GPT_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${openAIKey || process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
+  const response = await axios.post<CreateChatCompletionResponse>(
+    GPT_API_URL,
+    {
       model: GPT_TURBO,
       messages,
-    }),
-  });
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openAIKey || process.env.OPENAI_API_KEY}`,
+      },
+    }
+  );
 
   if (response.status !== 200) {
     throw new Error('Failed to create chat completion');
   }
 
-  const data = (await response.json()) as CreateChatCompletionResponse;
-
-  return data.choices[0].message?.content;
+  return response.data.choices[0].message?.content;
 };
 
 /** Return chat completion ReadableStream response body  */
