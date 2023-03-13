@@ -37,6 +37,10 @@ export interface Question {
   choices: Record<Choice, string>;
 }
 
+export interface GeneratedQuestion extends Question {
+  answer: Choice;
+}
+
 export interface Answer {
   correct: boolean;
   explanation: string;

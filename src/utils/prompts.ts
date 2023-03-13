@@ -1,12 +1,17 @@
 import type { Difficulty, NumQuestion, Topic } from '~/types';
 
+const questionLimit = {
+  choiceLength: 1,
+  explanationLength: 2,
+};
+
 /** Prompt to generate a quiz object with the requested number of questions, difficulty level and topic */
 export const getQuizGenerationPrompt = (
   numQuestion: NumQuestion,
   difficulty: Difficulty,
   topic: Topic
 ) => {
-  return `Generate a quiz with the requested number of questions, difficulty level and topic.You must be highly confident in knowing the correct answer to the questions.The multiple choices should be short, and of maximum 1 sentence. The correct answer should be placed randomly in the multiple choices. The explanation should be maximum of 2 sentences.
+  return `Generate a quiz with the requested number of questions, difficulty level and topic.You must be highly confident in knowing the correct answer to the questions.The multiple choices should be short, and of maximum ${questionLimit.choiceLength} sentence. The explanation should be maximum of ${questionLimit.explanationLength} sentences.
 
 New: 2 questions, easy difficulty, the topic is "Breaking Bad"
 Quiz: [

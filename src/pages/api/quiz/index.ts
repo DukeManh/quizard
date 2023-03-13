@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import type { QuizSettings, Message, Question } from '../../../types/index';
+import type { GeneratedQuestion, QuizSettings, Message, Choice } from '~/types';
 import { createChatCompletion } from '~/utils/chatgpt';
 import { Quizzes } from '~/utils/db';
 import { getQuizGenerationPrompt } from '~/utils/prompts';
@@ -17,6 +17,37 @@ const validateRequest = (req: NextApiRequest) => {
       typeof openAIKey &&
       openAIKey !== 'string')
   );
+};
+
+// shuffle the choices and update the correct answer
+export const shuffleChoices = (
+  question: GeneratedQuestion
+): GeneratedQuestion => {
+  const choices = { ...question.choices };
+  let { answer } = question;
+
+  for (let i = 0; i < 4; i += 1) {
+    const beingSwapped = String.fromCharCode(i + 65) as Choice;
+    const swapTo = String.fromCharCode(
+      Math.floor(Math.random() * 4) + 65
+    ) as Choice;
+
+    const temp = choices[beingSwapped];
+
+    if (answer === beingSwapped) {
+      answer = swapTo;
+    } else if (answer === swapTo) {
+      answer = beingSwapped;
+    }
+
+    choices[beingSwapped] = choices[swapTo];
+    choices[swapTo] = temp;
+  }
+  return {
+    ...question,
+    choices,
+    answer,
+  };
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -59,24 +90,31 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     topic,
   });
 
+  let completionText = '';
   createChatCompletion(messages, openAIKey)
     .then((completion) => {
       try {
-        const questions = JSON.parse(completion!) as Question[];
-        const dbQuestions = questions.map((q, index) => {
-          return {
-            ...q,
-            number: index.toString(),
-            quizId: newQuiz,
-          };
-        });
+        completionText = completion!;
+        const generatedQuestions = JSON.parse(
+          completion!
+        ) as GeneratedQuestion[];
+
+        const questions = generatedQuestions
+          .map((q) => shuffleChoices(q))
+          .map((q, index) => {
+            return {
+              ...q,
+              number: index.toString(),
+              quizId: newQuiz,
+            };
+          });
 
         Quizzes.updateOne(newQuiz, {
-          questions: dbQuestions,
+          questions,
           loaded: true,
         });
       } catch (err) {
-        console.error('Failed to parse quiz', err);
+        console.error('Failed to parse quiz', completionText, err);
         Quizzes.updateOne(newQuiz, {
           failed: true,
           reason: 'Failed to parse quiz, ensure the quiz topic is valid',
