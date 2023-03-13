@@ -11,33 +11,33 @@ export const getQuizGenerationPrompt = (
   difficulty: Difficulty,
   topic: Topic
 ) => {
-  return `Generate a quiz with the requested number of questions, difficulty level and topic.You must be highly confident in knowing the correct answer to the questions.The multiple choices should be short, and of maximum ${questionLimit.choiceLength} sentence. The explanation should be maximum of ${questionLimit.explanationLength} sentences.
+  return `Generate a quiz with the requested number of questions, difficulty level and topic.You must be highly confident in knowing the correct answer to the questions.The multiple choices should be short, and of maximum ${questionLimit.choiceLength} sentence. The explanation should be maximum of ${questionLimit.explanationLength} sentences. The response format should be a valid json array.
 
 New: 2 questions, easy difficulty, the topic is "Breaking Bad"
 Quiz: [
-    {
-      "question": "What is the name of the chemical compound that Walter White and Jesse Pinkman cook in the series?",
-      "choices": {
-        "A": "Methamphetamine",
-        "B": "Cocaine",
-        "C": "Heroin",
-        "D": "LSD"
-      },
-      "answer": "A",
-      "explanation": "This is the drug that Walter and Jesse cook and sell throughout the series. It is a highly addictive and dangerous drug that causes severe health problems."
+  {
+    "question": "What is the name of the chemical compound that Walter White and Jesse Pinkman cook in the series?",
+    "choices": {
+      "A": "Methamphetamine",
+      "B": "Cocaine",
+      "C": "Heroin",
+      "D": "LSD"
     },
-    {
-      "question": "What is the name of the drug kingpin that Walter White works for in the series?",
-      "choices": {
-        "A": "Gus Fring",
-        "B": "Tuco Salamanca",
-        "C": "Hector Salamanca",
-        "D": "Don Eladio"
-      },
-      "answer": "A",
-      "explanation": "Gus is a highly intelligent and ruthless drug lord who becomes a major antagonist in the series. He is known for his calm demeanor and meticulous planning."
-    }
-  ]
+    "answer": "A",
+    "explanation": "This is the drug that Walter and Jesse cook and sell throughout the series. It is a highly addictive and dangerous drug that causes severe health problems."
+  },
+  {
+    "question": "What is the name of the drug kingpin that Walter White works for in the series?",
+    "choices": {
+      "A": "Gus Fring",
+      "B": "Tuco Salamanca",
+      "C": "Hector Salamanca",
+      "D": "Don Eladio"
+    },
+    "answer": "A",
+    "explanation": "Gus is a highly intelligent and ruthless drug lord who becomes a major antagonist in the series. He is known for his calm demeanor and meticulous planning."
+  }
+]
 
 ##
 New: 1 question, hard difficulty, the topic is "ReactJS"
