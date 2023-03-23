@@ -9,32 +9,18 @@ import {
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { NextSeo } from 'next-seo';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
+import {
+  getQuiz,
+  checkAnswer,
+  formatTime,
+  getTimeSince,
+} from '../../lib/pages/quiz/utils';
 import BlinkingDots from '~/lib/components/BlinkingDots';
 import QuestionComponent from '~/lib/components/Question';
 import Result from '~/lib/components/Result';
 import type { Answer, Choice, Quiz } from '~/types';
-
-const getQuiz = async (id: string) => {
-  const res = await fetch(`/api/quiz/${id}`);
-  return res.json();
-};
-
-const checkAnswer = async (
-  id: string,
-  questionNumber: string,
-  choice: Choice
-) => {
-  const res = await fetch(`/api/quiz/${id}/question/${questionNumber}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ choice }),
-  });
-  return res.json();
-};
 
 const QuizPage = () => {
   const router = useRouter();
@@ -45,6 +31,16 @@ const QuizPage = () => {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [ended, setEnded] = useState(false);
   const [selected, setSelected] = useState<Choice>();
+  const [timeSinceQuizCreated, setTimeSinceQuizCreated] = useState<number>();
+  const updateTimeInterval = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    return () => {
+      if (updateTimeInterval.current) {
+        clearInterval(updateTimeInterval.current);
+      }
+    };
+  }, [id]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -53,6 +49,14 @@ const QuizPage = () => {
           router.push(`/quiz/${id}`, undefined, {
             shallow: true,
           });
+
+          if (!quiz) {
+            setTimeSinceQuizCreated(getTimeSince(data.created_date));
+            updateTimeInterval.current = setInterval(() => {
+              setTimeSinceQuizCreated((prev) => prev! + 1);
+            }, 1000);
+          }
+
           setQuiz((prev) => ({
             ...prev,
             ...data,
@@ -177,6 +181,11 @@ const QuizPage = () => {
             ) : !isQuizLoaded ? (
               <>
                 <span>Preparing your quiz </span>
+                {timeSinceQuizCreated && (
+                  <span>
+                    , started {formatTime(timeSinceQuizCreated)} ago &nbsp;
+                  </span>
+                )}
                 <BlinkingDots />
               </>
             ) : null}

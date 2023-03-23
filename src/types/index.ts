@@ -1,3 +1,4 @@
+import type { Timestamp } from 'firebase/firestore';
 import type { ChatCompletionRequestMessage } from 'openai';
 
 export type NumQuestion = 5 | 10 | 15 | 20;
@@ -21,7 +22,7 @@ export interface Quiz extends QuizSettings {
   failed: boolean;
   reason?: string;
   last_updated: Date;
-  created_date: Date;
+  created_date: Timestamp;
 }
 
 export enum Choice {
