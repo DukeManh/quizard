@@ -15,6 +15,7 @@ import {
   Link,
   InputGroup,
   InputRightElement,
+  useColorMode,
 } from '@chakra-ui/react';
 import type { ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 import { createParser } from 'eventsource-parser';
@@ -36,6 +37,7 @@ import {
 
 const Home = () => {
   const [openAIKey, saveOpenAIKey] = useLocalStorage('openAIKey');
+  const { colorMode } = useColorMode();
   const { register, handleSubmit, watch, setValue } = useForm<Inputs>({
     defaultValues: {
       openAIKey: openAIKey || '',
@@ -51,12 +53,15 @@ const Home = () => {
     topic: '',
     subTopics: [] as string[],
   });
+  const [loadingSubTopics, setLoadingSubTopics] = useState(false);
 
   const getSubTopics = async (topic: string) => {
+    setLoadingSubTopics(true);
     setSubTopics('');
     setSubTopicsSuggestion({ topic: '', subTopics: [] });
     const stream = await getTopicSuggestion(topic);
     if (!stream) {
+      setLoadingSubTopics(false);
       return;
     }
 
@@ -69,6 +74,7 @@ const Home = () => {
             topic,
             subTopics: prev.topic.split(', '),
           }));
+          setLoadingSubTopics(false);
           return;
         }
         try {
@@ -165,10 +171,17 @@ const Home = () => {
               />
               <InputRightElement width="5.4rem">
                 <Button
-                  isDisabled={!watch('topic')}
+                  isDisabled={!watch('topic') || loadingSubTopics}
                   h="1.75rem"
                   size="sm"
                   onClick={() => getSubTopics(watch('topic'))}
+                  transition="background-color 0.25s ease-in-out"
+                  sx={{
+                    ...(watch('topic') && {
+                      bg: colorMode === 'dark' ? 'green.200' : 'green.400',
+                      color: colorMode === 'dark' ? 'black' : 'white',
+                    }),
+                  }}
                 >
                   Suggest
                 </Button>
@@ -182,6 +195,7 @@ const Home = () => {
             >
               {subTopicsSuggestion.subTopics.length ? (
                 <Text fontSize="sm" color="gray.500">
+                  Select: &nbsp;
                   {subTopicsSuggestion.subTopics.map((subTopic, index) => (
                     <Text
                       as="span"
@@ -208,6 +222,7 @@ const Home = () => {
                 </Text>
               ) : (
                 <Text fontSize="sm" color="gray.500">
+                  Select: &nbsp;
                   {subTopics}
                 </Text>
               )}
