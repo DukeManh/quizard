@@ -1,4 +1,5 @@
 <img src="./public/quizard.svg" alt="Quizard" width="100" />
+
 # Quizard
 
 [Quizard](quizard-kappa.vercel.app/): chatGPT-generated quizzes on any just-about topic.
